@@ -3,10 +3,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
+#include <fcntl.h>
 #define RPI_GPIO_DIR "/sys/class/gpio/gpio"
 #define RPI_GPIO_EXPORT "/sys/class/gpio/export"
 #define MAXBUFFER 64	
-#define MAX_PATH_BUFFER = 30;
+#define MAX_PATH_BUFFER 30
 
 int pinMode(int pin, int mode){
 //Variables declaration.
@@ -48,66 +50,73 @@ fclose(direction);
 return(0);
 }
 
-// int digitalWrite(int pin, int value){
-// 	int fileDescriptor;
-// 	char buffer[MAX_PATH_BUFFER];
-
-// 	sprintf(buffer, ""/sys/class/gpio/"gpio%d/value", pin);
-// 	fileDescriptor= open(buffer, O_WRONLY);
-
-// 	if(fileDescriptor==-1){
-// 		fprintf(stderr, "Failed to open gpio pin\n");
-// 		return(-1);
-// 	}
-// 	if(write(fileDescriptor, value+'0',1)!=1){
-// 		fprintf(stderr, "Failed to write value\n");
-// 		return(-1);
-// 	}
 
 
-// 	close(fileDescriptor);
-// 	return(0);
-// }
+int digitalWrite(int pin, int value){
+	int fileDescriptor;
+	char* v;
+	char buffer[MAX_PATH_BUFFER];
 
-// int digitalRead(int pin, int value){
+	sprintf(buffer, "/sys/class/gpio/gpio%d/value", pin);
+	fileDescriptor= open(buffer, O_WRONLY);
 
-// 	int fileDescriptor;
-// 	char buffer[MAX_PATH_BUFFER];
-// 	char value[3];
+	*v=value+'0';
 
-// 	sprintf(buffer, ""/sys/class/gpio/"gpio%d/value", pin);
-// 	fileDescriptor= open(buffer, O_RDONLY);
+	if(fileDescriptor==-1){
+		fprintf(stderr, "Failed to open gpio pin\n");
+		return(-1);
+	}
+	if(write(fileDescriptor, v,1)!=1){
+		fprintf(stderr, "Failed to write value\n");
+		return(-1);
+	}
 
-// 	if(fileDescriptor==-1){
-// 		fprintf(stderr, "Failed to open gpio pin\n");
-// 		return(-1);
-// 	}
-// 	if(read(fileDescriptor,&value,1)==-1){
-// 		fprintf(stderr, "Failed to read value\n");
-// 		return(-1);
-// 	}
 
-// 	close(fileDescriptor);
-// 	return(atoi(value));
-// }
+	close(fileDescriptor);
+	return(0);
+}
 
-// int blink(int pin, int freq, int duration){
+int digitalRead(int pin){
 
-// 	time_t start,end;
-// 	double elapsed;
-// 	int condition=1;
-// 	time(&start);
-// 	while(condition){
-// 		time(&end);
-// 		elapsed=difftime(end,start);
-// 		if(elapsed>= duration){
-// 			condition=0;
-// 		}
-// 		digitalWrite(pin,1);
-// 		delay(freq);
-// 		digitalWrite(pin,0);
-// 		return(0);
-// 	}
+	int fileDescriptor;
+	char buffer[MAX_PATH_BUFFER];
+	char value[3];
+
+	sprintf(buffer, "/sys/class/gpio/gpio%d/value", pin);
+	fileDescriptor= open(buffer, O_RDONLY);
+
+	if(fileDescriptor==-1){
+		fprintf(stderr, "Failed to open gpio pin\n");
+		return(-1);
+	}
+	if(read(fileDescriptor,&value,1)==-1){
+		fprintf(stderr, "Failed to read value\n");
+		return(-1);
+	}
+
+	close(fileDescriptor);
+	return(atoi(value));
+}
+
+int blink(int pin, int freq, int duration){
+
+	time_t start,end;
+	double elapsed;
+	int condition=1;
+	time(&start);
+	while(condition){
+		time(&end);
+		elapsed=difftime(end,start);
+		if(elapsed>= duration){
+			condition=0;
+		}
+		digitalWrite(pin,1);
+		sleep(freq);
+		digitalWrite(pin,0);
+		return(0);
+	}
+}
+
 	
 // int unexportPin(int pin){
 
