@@ -3,6 +3,7 @@ SRC=$(APP).c
 OBJ=$(APP).o
 CC=gcc
 CFLAG=-I../include
+LD=arm-poky-linux-gnueabi-ld
 DYNAMIC=lib$(APP).so
 DYN_MSG="Creando biblioteca dinamica..."
 COMP_MSG="Compilando gpio.c..."
@@ -13,7 +14,7 @@ all: $(OBJ) $(DYNAMIC)
 $(DYNAMIC): $(OBJ)
 		@echo $(value DYN_MSG)
 		$(CC) $(CFLAG) -c -fpic $(SRC)
-		ld $(CFLAG) -o $(DYNAMIC) $(OBJ) -shared
+		$(LD) $(CFLAG) -o $(DYNAMIC) $(OBJ) -shared
 
 $(OBJ): $(SRC)
 		@echo $(value COMP_MSG)
