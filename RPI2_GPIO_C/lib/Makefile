@@ -1,9 +1,7 @@
 APP=gpio
 SRC=$(APP).c
 OBJ=$(APP).o
-CC=gcc
-CFLAG=-I../include
-LD=arm-poky-linux-gnueabi-ld
+CFLAG+=-I../include
 DYNAMIC=lib$(APP).so
 DYN_MSG="Creando biblioteca dinamica..."
 COMP_MSG="Compilando gpio.c..."
