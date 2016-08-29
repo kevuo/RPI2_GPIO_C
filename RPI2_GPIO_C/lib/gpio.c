@@ -24,22 +24,22 @@ if (exp == NULL)
     exit(1);
 }
 
-//printf("echo %d > /sys/class/gpio/export\n");
+printf("echo %d > /sys/class/gpio/export\n", pin);
 fprintf(exp, "%d", pin);
 
-//fprintf(exp, "%s %d %s %s", "echo", pin, ">", RPI_GPIO_EXPORT);
 printf("Pin exportado\n");
 fclose(exp);
 
 //Assign port direction
 if(mode==0){
-	strcpy(modeValue, "out");
-}else{
 	strcpy(modeValue, "in");
+}else{
+	strcpy(modeValue, "out");
 }
 
 sprintf(path, "/sys/class/gpio/gpio%d/direction", pin);
 //Write port direction to file
+printf("Abriendo pin en la direccion: %s\n", path);
 direction = fopen(path, "w");
 if (direction == NULL)
 {
@@ -48,6 +48,7 @@ if (direction == NULL)
 }
 
 fprintf(direction, modeValue);
+printf("Pin %d se asigna como: %s\n", pin, modeValue);
 fclose(direction);
 
 return(0);
