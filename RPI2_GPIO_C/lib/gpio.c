@@ -5,10 +5,9 @@
 #include <time.h>
 #include <unistd.h>
 #include <fcntl.h>
-#define RPI_GPIO_DIR "/sys/class/gpio/gpio"
 #define RPI_GPIO_EXPORT "/sys/class/gpio/export"
+#define RPI_GPIO_UNEXPORT "/sys/class/gpio/unexport"
 #define MAXBUFFER 64	
-#define MAX_PATH_BUFFER 30
 
 int pinMode(int pin, int mode){
 //Variables declaration.
@@ -24,10 +23,10 @@ if (exp == NULL)
     exit(1);
 }
 
-printf("echo %d > /sys/class/gpio/export\n", pin);
+//printf("echo %d > /sys/class/gpio/export\n", pin);
 fprintf(exp, "%d", pin);
 
-printf("Pin exportado\n");
+//printf("Pin exportado\n");
 fclose(exp);
 
 //Assign port direction
@@ -39,7 +38,7 @@ if(mode==0){
 
 sprintf(path, "/sys/class/gpio/gpio%d/direction", pin);
 //Write port direction to file
-printf("Abriendo pin en la direccion: %s\n", path);
+//printf("Abriendo pin en la direccion: %s\n", path);
 direction = fopen(path, "w");
 if (direction == NULL)
 {
@@ -47,17 +46,18 @@ if (direction == NULL)
     exit(1);
 }
 
-fprintf(direction, modeValue);
+fprintf(direction, "%s", modeValue);
 printf("Pin %d se asigna como: %s\n", pin, modeValue);
 fclose(direction);
 
 return(0);
 }
 
+
 int digitalWrite(int pin, int value){
 	int fileDescriptor;
 	char* v;
-	char buffer[MAX_PATH_BUFFER];
+	char buffer[MAXBUFFER];
 
 	sprintf(buffer, "/sys/class/gpio/gpio%d/value", pin);
 	fileDescriptor= open(buffer, O_WRONLY);
@@ -81,7 +81,7 @@ int digitalWrite(int pin, int value){
 int digitalRead(int pin){
 
 	int fileDescriptor;
-	char buffer[MAX_PATH_BUFFER];
+	char buffer[MAXBUFFER];
 	char value[3];
 
 	sprintf(buffer, "/sys/class/gpio/gpio%d/value", pin);
@@ -126,4 +126,23 @@ void delay(int dly){
  while(difftime(current, start) < dly){
   time(&current);
  }
+}
+
+int unexportPin(int pin){
+//Variables declaration.
+FILE *unexp; 
+//Unexport given pin.
+unexp = fopen(RPI_GPIO_UNEXPORT, "w");
+if (unexp == NULL)
+{
+    printf("Error opening file!\n");
+    exit(1);
+}
+
+//printf("echo %d > /sys/class/gpio/unexport\n", pin);
+fprintf(unexp, "%d", pin);
+
+//printf("Pin desexportado\n");
+fclose(unexp);
+return(0);
 }

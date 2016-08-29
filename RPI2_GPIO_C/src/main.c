@@ -9,5 +9,7 @@ int main(){
 	pinMode(8, IN);
 	pinMode(9, OUT);
 	pinMode(11, IN);
+	unexportPin(2);
+	unexportPin(4);
 	return(0);
 }
