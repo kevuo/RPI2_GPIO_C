@@ -23,8 +23,9 @@ if (exp == NULL)
     printf("Error opening file!\n");
     exit(1);
 }
-printf("echo %d > /sys/class/gpio/export\n");
-fprintf(exp, "echo %d > /sys/class/gpio/export ", pin);
+
+//printf("echo %d > /sys/class/gpio/export\n");
+fprintf(exp, "%d", pin);
 
 //fprintf(exp, "%s %d %s %s", "echo", pin, ">", RPI_GPIO_EXPORT);
 printf("Pin exportado\n");
@@ -37,6 +38,7 @@ if(mode==0){
 	strcpy(modeValue, "in");
 }
 
+sprintf(path, "/sys/class/gpio/gpio%d/direction", pin);
 //Write port direction to file
 direction = fopen(path, "w");
 if (direction == NULL)
@@ -45,7 +47,7 @@ if (direction == NULL)
     exit(1);
 }
 
-fprintf(direction,"echo %s > %s%d/direction", modeValue, RPI_GPIO_DIR, pin);
+fprintf(direction, modeValue);
 fclose(direction);
 
 return(0);
@@ -74,12 +76,6 @@ int digitalWrite(int pin, int value){
 	close(fileDescriptor);
 	return(0);
 }
-
-
-
-
-
-
 
 int digitalRead(int pin){
 
