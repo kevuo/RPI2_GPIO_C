@@ -7,7 +7,7 @@ LD_FLAGS+=-L../lib/ -lgpio
 EXE_MSG="Generando ejecutable..."
 CLN_MSG="Borrando ejecutable..."
 
-all: $(EXE)
+all: del $(EXE)
 
 del:
 		rm ../lib/gpio.o
