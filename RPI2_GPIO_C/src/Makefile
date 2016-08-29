@@ -1,7 +1,7 @@
 APP=main
 OP=libgpio
 SRC=$(APP).c
-EXE=../bin/$(APP)
+EXE=../src/$(APP)
 CFLAG+=-I../include
 LD_FLAGS+=-L../lib/ -lgpio
 EXE_MSG="Generando ejecutable..."
