@@ -56,19 +56,25 @@ return(0);
 
 int digitalWrite(int pin, int value){
 	int fileDescriptor;
-	char* v;
+	char v;
 	char buffer[MAXBUFFER];
 
 	sprintf(buffer, "/sys/class/gpio/gpio%d/value", pin);
 	fileDescriptor= open(buffer, O_WRONLY);
 
-	*v=value+'0';
+	if(value==1){
+		v='1';
+	}
+	else if (value==0)
+	{
+		v='0';
+	}
 
 	if(fileDescriptor==-1){
 		fprintf(stderr, "Failed to open gpio pin\n");
 		return(-1);
 	}
-	if(write(fileDescriptor, v,1)!=1){
+	if(write(fileDescriptor, &v,1)!=1){
 		fprintf(stderr, "Failed to write value\n");
 		return(-1);
 	}
@@ -100,7 +106,7 @@ int digitalRead(int pin){
 	return(atoi(value));
 }
 
-int blink(int pin, int freq, int duration){
+int blink(int pin, double freq, double duration){
 
 	time_t start,end;
 	double elapsed;
@@ -112,14 +118,17 @@ int blink(int pin, int freq, int duration){
 		if(elapsed>= duration){
 			condition=0;
 		}
+		digitalWrite(pin,0);
+		delay(freq);
 		digitalWrite(pin,1);
 		delay(freq);
-		digitalWrite(pin,0);
-		return(0);
 	}
+	digitalWrite(pin,0);
+	//unexportPin(pin);
+	return (0);
 }
 
-void delay(int dly){
+void delay(double dly){
  time_t start = time(NULL);
  time_t current;
 
@@ -130,7 +139,8 @@ void delay(int dly){
 
 int unexportPin(int pin){
 //Variables declaration.
-FILE *unexp; 
+FILE *unexp;
+
 //Unexport given pin.
 unexp = fopen(RPI_GPIO_UNEXPORT, "w");
 if (unexp == NULL)
