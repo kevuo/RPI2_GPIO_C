@@ -54,19 +54,25 @@ return(0);
 
 int digitalWrite(int pin, int value){
 	int fileDescriptor;
-	char* v;
+	char v;
 	char buffer[MAX_PATH_BUFFER];
 
 	sprintf(buffer, "/sys/class/gpio/gpio%d/value", pin);
 	fileDescriptor= open(buffer, O_WRONLY);
 
-	*v=value+'0';
+	if(value==1){
+		v='1';
+	}
+	else if (value==0)
+	{
+		v='0';
+	}
 
 	if(fileDescriptor==-1){
 		fprintf(stderr, "Failed to open gpio pin\n");
 		return(-1);
 	}
-	if(write(fileDescriptor, v,1)!=1){
+	if(write(fileDescriptor, &v,1)!=1){
 		fprintf(stderr, "Failed to write value\n");
 		return(-1);
 	}
@@ -118,7 +124,7 @@ int blink(int pin, int freq, int duration){
 }
 
 	
-// int unexportPin(int pin){
+ int freePin(int pin){
 
-// return(0);
-// }
+ return(0);
+ }

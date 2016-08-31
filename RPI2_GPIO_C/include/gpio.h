@@ -5,6 +5,6 @@ int pinMode(int pin, int mode);
 int digitalWrite(int pin, int value);
 int digitalRead(int pin);
 int blink(int pin, int freq, int duration);
-int unexportPin(int pin);
+int freePin(int pin);
 
 #endif 
