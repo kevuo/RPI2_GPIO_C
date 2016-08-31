@@ -9,12 +9,14 @@
 #define RPI_GPIO_UNEXPORT "/sys/class/gpio/unexport"
 #define MAXBUFFER 64	
 
+//Establishes the given pin number as input or output.
 int pinMode(int pin, int mode){
 //Variables declaration.
 FILE *exp; 
 FILE *direction;
 char modeValue[MAXBUFFER]; 
 char path[MAXBUFFER];
+
 //Export given pin.
 exp = fopen(RPI_GPIO_EXPORT, "w");
 if (exp == NULL)
@@ -22,14 +24,13 @@ if (exp == NULL)
     printf("Error opening file!\n");
     exit(1);
 }
-
-//printf("echo %d > /sys/class/gpio/export\n", pin);
+//Write the pin number to file.
 fprintf(exp, "%d", pin);
 
-//printf("Pin exportado\n");
+//Close file after write.
 fclose(exp);
 
-//Assign port direction
+//Assign port direction.
 if(mode==0){
 	strcpy(modeValue, "in");
 }else{
@@ -37,8 +38,8 @@ if(mode==0){
 }
 
 sprintf(path, "/sys/class/gpio/gpio%d/direction", pin);
-//Write port direction to file
-//printf("Abriendo pin en la direccion: %s\n", path);
+
+//Write port direction to file.
 direction = fopen(path, "w");
 if (direction == NULL)
 {
@@ -47,18 +48,19 @@ if (direction == NULL)
 }
 
 fprintf(direction, "%s", modeValue);
-printf("Pin %d se asigna como: %s\n", pin, modeValue);
 fclose(direction);
 
 return(0);
 }
 
-
+//Sets the input value to the given pin. (1:ON, 0:OFF)
 int digitalWrite(int pin, int value){
+	//Variables declaration.
 	int fileDescriptor;
 	char v;
 	char buffer[MAXBUFFER];
 
+	//Open file and set as write only.
 	sprintf(buffer, "/sys/class/gpio/gpio%d/value", pin);
 	fileDescriptor= open(buffer, O_WRONLY);
 
@@ -69,7 +71,7 @@ int digitalWrite(int pin, int value){
 	{
 		v='0';
 	}
-
+	//Write value to file.
 	if(fileDescriptor==-1){
 		fprintf(stderr, "Failed to open gpio pin\n");
 		return(-1);
@@ -79,20 +81,23 @@ int digitalWrite(int pin, int value){
 		return(-1);
 	}
 
-
+	//Close file.
 	close(fileDescriptor);
 	return(0);
 }
 
+//Reads the value held by given pin.
 int digitalRead(int pin){
-
+	//Variables declaration
 	int fileDescriptor;
 	char buffer[MAXBUFFER];
 	char value[3];
 
+	//Open file and set as read only.
 	sprintf(buffer, "/sys/class/gpio/gpio%d/value", pin);
 	fileDescriptor= open(buffer, O_RDONLY);
 
+	//Read value from file.
 	if(fileDescriptor==-1){
 		fprintf(stderr, "Failed to open gpio pin\n");
 		return(-1);
@@ -101,17 +106,19 @@ int digitalRead(int pin){
 		fprintf(stderr, "Failed to read value\n");
 		return(-1);
 	}
-
+	//Close file and return read value.
 	close(fileDescriptor);
 	return(atoi(value));
 }
-
+//Turns on and off a LED connected to the given pin
+//in the input frequency and duration.
 int blink(int pin, double freq, double duration){
-
+	//Variables declaration.
 	time_t start,end;
 	double elapsed;
 	int condition=1;
 	time(&start);
+	//Loop that turns on and off the LED.
 	while(condition){
 		time(&end);
 		elapsed=difftime(end,start);
@@ -124,10 +131,10 @@ int blink(int pin, double freq, double duration){
 		delay(freq);
 	}
 	digitalWrite(pin,0);
-	//unexportPin(pin);
 	return (0);
 }
 
+//Auxiliar function in charge of holding up the given time.
 void delay(double dly){
  time_t start = time(NULL);
  time_t current;
@@ -137,11 +144,12 @@ void delay(double dly){
  }
 }
 
+//Unexports the given pin.
 int unexportPin(int pin){
 //Variables declaration.
 FILE *unexp;
 
-//Unexport given pin.
+//Open file for writing.
 unexp = fopen(RPI_GPIO_UNEXPORT, "w");
 if (unexp == NULL)
 {
@@ -149,10 +157,8 @@ if (unexp == NULL)
     exit(1);
 }
 
-//printf("echo %d > /sys/class/gpio/unexport\n", pin);
+//Unexport the pin.
 fprintf(unexp, "%d", pin);
-
-//printf("Pin desexportado\n");
 fclose(unexp);
 return(0);
 }
